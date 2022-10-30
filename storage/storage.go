@@ -21,6 +21,7 @@ type Page struct {
 }
 
 var ErrNoSavedPages = errors.New("no saved pages")
+var ErrStorageNotExists = errors.New("no saved pages")
 
 func (p Page) Hash() (string, error) {
 	h := sha1.New()

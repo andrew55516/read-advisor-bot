@@ -18,8 +18,8 @@ type Storage struct {
 	basePath string
 }
 
-func New(basePath string) Storage {
-	return Storage{basePath: basePath}
+func New(basePath string) *Storage {
+	return &Storage{basePath: basePath}
 }
 
 func (s *Storage) Save(page *storage.Page) error {
@@ -51,13 +51,17 @@ func (s *Storage) Save(page *storage.Page) error {
 func (s *Storage) PickRandom(UserName string) (*storage.Page, error) {
 	fPath := filepath.Join(s.basePath, UserName)
 
+	if _, err := os.Stat(fPath); os.IsNotExist(err) {
+		return nil, e.Wrap("can't pick random page", storage.ErrStorageNotExists)
+	}
+
 	files, err := os.ReadDir(fPath)
 	if err != nil {
 		return nil, e.Wrap("can't pick random page", err)
 	}
 
 	if len(files) == 0 {
-		return nil, storage.ErrNoSavedPages
+		return nil, e.Wrap("can't pick random page", storage.ErrNoSavedPages)
 	}
 
 	rand.Seed(time.Now().Unix())
